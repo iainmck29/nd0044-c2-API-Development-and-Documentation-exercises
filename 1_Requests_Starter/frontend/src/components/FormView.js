@@ -4,7 +4,7 @@ import $ from 'jquery';
 import '../stylesheets/FormView.css';
 
 class FormView extends Component {
-  constructor(props){
+  constructor(props) {
     super();
     this.state = {
       title: "",
@@ -17,7 +17,7 @@ class FormView extends Component {
   submitBook = (event) => {
     event.preventDefault();
     $.ajax({
-      url: '/books', //TODO: update request URL
+      url: '/books/create', //TODO: update request URL
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -47,16 +47,16 @@ class FormView extends Component {
   }
 
   handleChange = (event) => {
-    this.setState({[event.target.name]: event.target.value})
+    this.setState({ [event.target.name]: event.target.value })
   }
 
   render() {
     return (
       <div id="form-view">
-        <div className="search" style={{'display': 'None'}}>
+        <div className="search" style={{ 'display': 'None' }}>
           <h2>Search</h2>
           <form className="FormView" id="search-form" onSubmit={this.handleSearch}>
-            <input type="text" name="search" onChange={this.handleChange}/>
+            <input type="text" name="search" onChange={this.handleChange} />
             <input type="submit" className="button" value="Submit" />
           </form>
         </div>
@@ -64,11 +64,11 @@ class FormView extends Component {
         <form className="FormView" id="add-book-form" onSubmit={this.submitBook}>
           <label>
             Title
-            <input type="text" name="title" onChange={this.handleChange}/>
+            <input type="text" name="title" onChange={this.handleChange} />
           </label>
           <label>
             Author
-            <input type="text" name="author" onChange={this.handleChange}/>
+            <input type="text" name="author" onChange={this.handleChange} />
           </label>
           <label>
             Rating

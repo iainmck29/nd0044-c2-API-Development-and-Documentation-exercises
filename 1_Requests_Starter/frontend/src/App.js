@@ -7,7 +7,7 @@ import Book from './components/Book';
 
 
 class App extends Component {
-  constructor(props){
+  constructor(props) {
     super();
     this.state = {
       page: 1,
@@ -23,7 +23,7 @@ class App extends Component {
       success: (result) => {
         this.setState({
           totalBooks: result.total_books,
-          books: result.books 
+          books: result.books
         })
         return;
       },
@@ -35,7 +35,7 @@ class App extends Component {
   }
 
   deleteBook = (id) => {
-    if(window.confirm('Are you sure you want to delete the book?')) {
+    if (window.confirm('Are you sure you want to delete the book?')) {
       $.ajax({
         url: `/books/${id}`, //TODO: update request URL
         type: "DELETE",
@@ -55,14 +55,14 @@ class App extends Component {
     let targetBook = books.find((book) => book.id === id);
 
     $.ajax({
-      url: `/books/${id}`, //TODO: update request URL
+      url: `/books/${id}/rating`, //TODO: update request URL
       type: "PATCH",
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({'rating': rating}),
+      data: JSON.stringify({ 'rating': rating }),
       success: (result) => {
         targetBook.rating = rating
-        this.setState({books})
+        this.setState({ books })
       },
       error: (error) => {
         alert('Unable to update the rating.')
@@ -77,7 +77,7 @@ class App extends Component {
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({search: search}),
+      data: JSON.stringify({ search: search }),
       xhrFields: {
         withCredentials: true
       },
@@ -98,16 +98,16 @@ class App extends Component {
     })
   }
 
-  
-  componentDidMount(){
+
+  componentDidMount() {
     this.getBooks()
   }
 
   selectPage(num) {
-    this.setState({page: num}, () => this.getBooks());
+    this.setState({ page: num }, () => this.getBooks());
   }
 
-  createPagination(){
+  createPagination() {
     let pageNumbers = [];
     let maxPage = Math.ceil(this.state.totalBooks / 8)
     for (let i = 1; i <= maxPage; i++) {
@@ -115,7 +115,7 @@ class App extends Component {
         <div
           key={i}
           className={`page-num ${i === this.state.page ? 'active' : ''}`}
-          onClick={() => {this.selectPage(i)}}>{i}
+          onClick={() => { this.selectPage(i) }}>{i}
         </div>)
     }
     return pageNumbers;
@@ -136,10 +136,10 @@ class App extends Component {
             ))}
           </div>
           <div className="pagination-menu">
-              {this.createPagination()}
+            {this.createPagination()}
           </div>
         </div>
-        <FormView searchBooks={this.searchBooks}/>
+        <FormView searchBooks={this.searchBooks} />
       </div>
     );
 
