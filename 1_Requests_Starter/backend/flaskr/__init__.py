@@ -68,25 +68,25 @@ def create_app(test_config=None):
 
     @app.route('/books/<int:book_id>', methods=['DELETE'])
     def delete_book(book_id):
-        book = Book.query.get(book_id)
-
         try:
+            book = Book.query.filter(Book.id == book_id).one_or_none()
+
+            if book is None:
+                abort(404)
+
             book.delete()
-
-        except:
-            db.session.rollback()
-            print(sys.exc_info())
-
-        finally:
-            db.session.close()
             selection = Book.query.order_by(Book.id).all()
             current_books = paginate_books(request, selection)
+
             return jsonify({
                 'success': True,
                 'deleted': book_id,
                 'books': current_books,
-                'total_books': len(selection)
+                'total_books': len(Book.query.all())
             })
+
+        except:
+            abort(422)
 
     @app.route('/books/create', methods=['POST'])
     def create_book():
@@ -117,5 +117,29 @@ def create_app(test_config=None):
                 'books': current_books,
                 'total_books': len(Book.query.all())
             })
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'bad request'
+        })
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Not found'
+        })
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'Unprocessable'
+        })
 
     return app
