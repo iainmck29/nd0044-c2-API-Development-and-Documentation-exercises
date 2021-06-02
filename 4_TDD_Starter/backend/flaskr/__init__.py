@@ -108,9 +108,6 @@ def create_app(test_config=None):
                     Book.title.ilike('%{}%'.format(search)))
                 current_books = paginate_books(request, selection)
 
-                if len(selection) == 0:
-                    abort(422)
-
                 return jsonify({
                     'success': True,
                     'books': current_books,
