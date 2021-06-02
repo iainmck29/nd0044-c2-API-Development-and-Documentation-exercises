@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskr import create_app
 from models import setup_db, Book
 
+
 class BookTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
@@ -14,7 +15,8 @@ class BookTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "bookshelf_test"
-        self.database_path = "postgres://{}:{}@{}/{}".format('student', 'student','localhost:5432', self.database_name)
+        self.database_path = "postgres://{}:{}@{}/{}".format(
+            'student', 'student', 'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_book = {
@@ -29,7 +31,7 @@ class BookTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -42,7 +44,7 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_books'])
         self.assertTrue(len(data['books']))
-    
+
     def test_404_sent_requesting_beyond_valid_page(self):
         res = self.client().get('/books?page=1000', json={'rating': 1})
         data = json.loads(res.data)
@@ -50,9 +52,25 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
-    
+
     # @TODO: Write tests for search - at minimum two
     #        that check a response when there are results and when there are none
+    def test_search_book_by_title(self):
+        res = self.client().post('/books',
+                                 json={'search': 'anansi'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_books'])
+
+    def test_search_book_by_title_error(self):
+        res = self.client().post('/books', json={'search': 'dont find me'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['books']), 0)
 
     def test_update_book_rating(self):
         res = self.client().patch('/books/5', json={'rating': 1})
@@ -62,7 +80,6 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(book.format()['rating'], 1)
-        
 
     def test_400_for_failed_update(self):
         res = self.client().patch('/books/5')
@@ -71,7 +88,7 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
-    
+
     def test_delete_book(self):
         res = self.client().delete('/books/1')
         data = json.loads(res.data)
@@ -84,7 +101,6 @@ class BookTestCase(unittest.TestCase):
         self.assertTrue(data['total_books'])
         self.assertTrue(len(data['books']))
         self.assertEqual(book, None)
-        
 
     def test_404_if_book_does_not_exist(self):
         res = self.client().delete('/books/1000')
@@ -93,12 +109,12 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
-    
+
     def test_create_new_book(self):
         res = self.client().post('/books', json=self.new_book)
         data = json.loads(res.data)
         pass
-    
+
     def test_422_if_book_creation_fails(self):
         res = self.client().post('/books', json=self.new_book)
         data = json.loads(res.data)
